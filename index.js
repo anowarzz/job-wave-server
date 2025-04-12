@@ -1,5 +1,5 @@
 const express = require("express");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const cors = require("cors");
 const app = express();
 const port = process.env.PORT || 5000;
@@ -22,13 +22,39 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
-    // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
+
+    // Retrieving Jobs Collection
+    const jobCollection = client.db("jobWave").collection("jobs");
+
+    // All jobs endpoint
+    app.get("/jobs", async (req, res) => {
+      try {
+        const cursor = jobCollection.find();
+        const jobs = await cursor.toArray();
+        res.send(jobs);
+      } catch (error) {
+        console.error("Error fetching jobs:", error);
+        res.status(500).send("Error fetching jobs");
+      }
+    });
+
+    // Single Job Details
+    app.get("/jobs/:id", async (req, res) => {
+      try {
+        const id = req.params.id;
+        const query = { _id: new ObjectId(id) };
+        const job = await jobCollection.findOne(query);
+        res.send(job);
+      } catch (error) {
+        console.error("Error fetching job details:", error);
+        res.status(500).send("Error fetching job details");
+      }
+    });
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
