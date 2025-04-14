@@ -28,10 +28,14 @@ async function run() {
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
 
-    // Retrieving Jobs Collection
+    // Jobs Collection
     const jobCollection = client.db("jobWave").collection("jobs");
+    //Job application collection
+    const jobApplicationCollection = client
+      .db("jobWave")
+      .collection("jobApplications");
 
-    // All jobs endpoint
+    // All jobs api
     app.get("/jobs", async (req, res) => {
       try {
         const cursor = jobCollection.find();
@@ -43,7 +47,7 @@ async function run() {
       }
     });
 
-    // Single Job Details
+    // Single Job Details api
     app.get("/jobs/:id", async (req, res) => {
       try {
         const id = req.params.id;
@@ -53,6 +57,22 @@ async function run() {
       } catch (error) {
         console.error("Error fetching job details:", error);
         res.status(500).send("Error fetching job details");
+      }
+    }); // Added missing closing bracket here
+
+    // Job applications api
+    app.post("/job-applications", async (req, res) => {
+      try {
+        const application = req.body;
+        console.log(application);
+        
+        const result = await jobApplicationCollection.insertOne(application);
+        console.log(result);
+        
+        res.send(result);
+      } catch (error) {
+        console.error("Error processing job application:", error);
+        res.status(500).send("Error processing job application");
       }
     });
   } finally {
