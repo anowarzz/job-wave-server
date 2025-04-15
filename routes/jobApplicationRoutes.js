@@ -5,8 +5,8 @@ const jobApplicationController = require("../controllers/jobApplicationControlle
 // Create job application
 router.post("/", jobApplicationController.createJobApplication);
 
-// Get applications by user
-router.get("/user/:userId", jobApplicationController.getApplicationsByUser);
+// Get applications by one user with query parameter for email
+router.get("/user", jobApplicationController.getApplicationsByUser);
 
 // Get applications by job
 router.get("/job/:jobId", jobApplicationController.getApplicationsByJob);

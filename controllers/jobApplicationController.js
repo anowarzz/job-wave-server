@@ -33,20 +33,20 @@ const createJobApplication = async (req, res) => {
   }
 };
 
-// Get applications by user
+// Get applications by user email
 const getApplicationsByUser = async (req, res) => {
   try {
-    const userId = req.params.userId;
+    const applicantEmail = req.query.email;
 
-    if (!userId) {
+    if (!applicantEmail) {
       return res.status(400).send({
         success: false,
-        message: "User ID is required",
+        message: "Applicant Email is required",
       });
     }
 
     const applications = await JobApplicationService.getApplicationsByUser(
-      userId
+      applicantEmail
     );
     res.send(applications);
   } catch (error) {
@@ -57,7 +57,7 @@ const getApplicationsByUser = async (req, res) => {
 // Get applications by job
 const getApplicationsByJob = async (req, res) => {
   try {
-    const jobId = req.params.jobId;
+    const jobId = req.params.job_id;
 
     if (!jobId) {
       return res.status(400).send({

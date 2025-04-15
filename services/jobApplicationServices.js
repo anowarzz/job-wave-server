@@ -24,15 +24,15 @@ const createJobApplication = async (applicationData) => {
   }
 };
 
-// Get applications by user
-const getApplicationsByUser = async (userId) => {
-  // Validate userId directly
-  if (!userId) {
-    throw createError("User ID is required", 400);
+// Get applications by user email
+const getApplicationsByUser = async (applicantEmail) => {
+  // Validate applicantEmail directly
+  if (!applicantEmail) {
+    throw createError("Applicant Email is required", 400);
   }
 
   try {
-    const query = { userId: userId };
+    const query = { applicant_email: applicantEmail };
     const cursor = jobApplicationCollection.find(query);
     const jobApplicationsByUser = await cursor.toArray();
     return jobApplicationsByUser;
@@ -50,7 +50,7 @@ const getApplicationsByJob = async (jobId) => {
   }
 
   try {
-    const query = { jobId: jobId };
+    const query = { job_id: jobId };
     const cursor = jobApplicationCollection.find(query);
     const applicationsByJob = await cursor.toArray();
     return applicationsByJob;

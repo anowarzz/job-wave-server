@@ -12,6 +12,8 @@ require("dotenv").config();
 app.use(cors());
 app.use(express.json());
 
+
+
 // API Routes
 app.use("/jobs", jobRoutes);
 app.use("/job-applications", jobApplicationRoutes);
