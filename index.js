@@ -3,8 +3,6 @@ const cors = require("cors");
 const { connectDB } = require("./config/dbConnection");
 const jobRoutes = require("./routes/jobRoutes");
 const jobApplicationRoutes = require("./routes/jobApplicationRoutes");
-const AppError = require("./utils/appError");
-const ErrorTypes = require("./utils/errorTypes");
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -28,7 +26,7 @@ app.use((req, res) => {
   res.status(404).json({
     success: false,
     message: `Can't find ${req.originalUrl} on this server!`,
-    errorType: ErrorTypes.NOT_FOUND_ERROR,
+    errorType: "NotFound",
   });
 });
 

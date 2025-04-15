@@ -1,18 +1,26 @@
 const JobApplicationService = require("../services/jobApplicationServices");
-const AppError = require("../utils/appError");
-const ErrorTypes = require("../utils/errorTypes");
+
+// Simple response handler function
+const sendErrorResponse = (res, error) => {
+  console.error(error);
+  const statusCode = error.statusCode || 500;
+  res.status(statusCode).send({
+    success: false,
+    message: error.message || "An unexpected error occurred",
+  });
+};
 
 // Create job application
 const createJobApplication = async (req, res) => {
   try {
     const applicationData = req.body;
+    console.log(applicationData);
 
     // Basic validation
-    if (!applicationData.userId || !applicationData.jobId) {
+    if (!applicationData.job_id || !applicationData.applicant_email) {
       return res.status(400).send({
         success: false,
-        message: "User ID and Job ID are required",
-        errorType: ErrorTypes.VALIDATION_ERROR,
+        message: "Job ID and Applicant Email are required",
       });
     }
 
@@ -21,21 +29,7 @@ const createJobApplication = async (req, res) => {
     );
     res.status(201).send(result);
   } catch (error) {
-    console.error("Error creating job application:", error);
-
-    if (error instanceof AppError) {
-      return res.status(error.statusCode).send({
-        success: false,
-        message: error.message,
-        errorType: error.errorType,
-      });
-    }
-
-    res.status(500).send({
-      success: false,
-      message: "Failed to create job application",
-      errorType: ErrorTypes.DATABASE_ERROR,
-    });
+    sendErrorResponse(res, error);
   }
 };
 
@@ -48,7 +42,6 @@ const getApplicationsByUser = async (req, res) => {
       return res.status(400).send({
         success: false,
         message: "User ID is required",
-        errorType: ErrorTypes.VALIDATION_ERROR,
       });
     }
 
@@ -57,21 +50,7 @@ const getApplicationsByUser = async (req, res) => {
     );
     res.send(applications);
   } catch (error) {
-    console.error("Error getting applications by user:", error);
-
-    if (error instanceof AppError) {
-      return res.status(error.statusCode).send({
-        success: false,
-        message: error.message,
-        errorType: error.errorType,
-      });
-    }
-
-    res.status(500).send({
-      success: false,
-      message: "Failed to fetch user applications",
-      errorType: ErrorTypes.DATABASE_ERROR,
-    });
+    sendErrorResponse(res, error);
   }
 };
 
@@ -84,7 +63,6 @@ const getApplicationsByJob = async (req, res) => {
       return res.status(400).send({
         success: false,
         message: "Job ID is required",
-        errorType: ErrorTypes.VALIDATION_ERROR,
       });
     }
 
@@ -93,21 +71,7 @@ const getApplicationsByJob = async (req, res) => {
     );
     res.send(applications);
   } catch (error) {
-    console.error("Error getting applications by job:", error);
-
-    if (error instanceof AppError) {
-      return res.status(error.statusCode).send({
-        success: false,
-        message: error.message,
-        errorType: error.errorType,
-      });
-    }
-
-    res.status(500).send({
-      success: false,
-      message: "Failed to fetch job applications",
-      errorType: ErrorTypes.DATABASE_ERROR,
-    });
+    sendErrorResponse(res, error);
   }
 };
 
