@@ -1,4 +1,5 @@
 const { client } = require("../config/dbConnection");
+const JobService = require("../services/jobServices");
 
 const jobApplicationCollection = client
   .db("jobWave")
@@ -14,8 +15,15 @@ const createError = (message, statusCode = 500) => {
 // Create job application
 const createJobApplication = async (applicationData) => {
   try {
+    // Add timestamp fields
+    const timestampedData = {
+      ...applicationData,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
     const jobApplication = await jobApplicationCollection.insertOne(
-      applicationData
+      timestampedData
     );
     return jobApplication;
   } catch (error) {
@@ -25,7 +33,7 @@ const createJobApplication = async (applicationData) => {
 };
 
 // Get applications by user email
-const getApplicationsByUser = async (applicantEmail) => {
+const getApplicationsByUser = async (applicantEmail, options = {}) => {
   // Validate applicantEmail directly
   if (!applicantEmail) {
     throw createError("Applicant Email is required", 400);
@@ -35,7 +43,22 @@ const getApplicationsByUser = async (applicantEmail) => {
     const query = { applicant_email: applicantEmail };
     const cursor = jobApplicationCollection.find(query);
     const jobApplicationsByUser = await cursor.toArray();
-    return jobApplicationsByUser;
+
+    // Combine each application with job details
+    const jobDetailsPromises = jobApplicationsByUser.map(
+      async (application) => {
+        const jobId = application.job_id;
+        const jobDetails = await JobService.getJobById(jobId);
+
+        return {
+          ...application,
+          jobDetails,
+        };
+      }
+    );
+    // returning the applications with job details
+    const applicationsWithJobDetails = await Promise.all(jobDetailsPromises);
+    return applicationsWithJobDetails;
   } catch (error) {
     console.error("Error in getApplicationsByUser service:", error);
     throw createError("Failed to fetch user applications");
